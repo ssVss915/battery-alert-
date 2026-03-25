@@ -3,104 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Battery Alarm</title>
+    <title>Battery Pro Alarm</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f4;}
-        h1 { color: #333; }
-        .controls { background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); display: inline-block; margin-bottom: 20px; text-align: left;}
-        .controls label { font-weight: bold; display: block; margin-top: 10px; }
-        select, input[type="file"] { margin-top: 5px; padding: 5px; width: 100%; }
-        #status { font-size: 24px; font-weight: bold; margin-top: 20px; color: blue; }
-        .btn { padding: 15px 30px; font-size: 18px; margin-top: 20px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 5px; width: 100%;}
+        /* Professional Dark Theme App Style */
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #121212; 
+            color: #ffffff; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            height: 100vh;
+        }
+        .header { 
+            background: #1f1f1f; 
+            width: 100%; 
+            padding: 20px 0; 
+            text-align: center; 
+            font-size: 22px; 
+            font-weight: bold; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+        }
+        .app-container { 
+            background: #1f1f1f; 
+            width: 90%; 
+            max-width: 400px; 
+            margin-top: 30px; 
+            border-radius: 15px; 
+            padding: 25px; 
+            box-sizing: border-box; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5); 
+        }
+        .section-title { 
+            font-size: 13px; 
+            color: #aaaaaa; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin-bottom: 15px; 
+        }
+        .slider-box { 
+            text-align: center; 
+            margin-bottom: 30px; 
+        }
+        .percent-display { 
+            font-size: 56px; 
+            font-weight: bold; 
+            color: #4CAF50; 
+            margin-bottom: 10px; 
+        }
+        /* Styling the range slider to look native */
+        input[type=range] { 
+            width: 100%; 
+            accent-color: #4CAF50; 
+            cursor: pointer;
+        }
+        .sound-list { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            margin-bottom: 30px; 
+        }
+        .sound-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #2a2a2a; 
+            padding: 12px 15px; 
+            border-radius: 10px; 
+        }
+        .sound-item label { 
+            flex-grow: 1; 
+            margin-left: 10px; 
+            font-size: 16px; 
+            cursor: pointer; 
+        }
+        input[type="radio"] {
+            accent-color: #4CAF50;
+            transform: scale(1.3);
+        }
+        .play-btn { 
+            background: #444; 
+            border: none; 
+            color: white; 
+            padding: 8px 15px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 14px;
+        }
+        .play-btn:hover { background: #555; }
+        .main-btn { 
+            width: 100%; 
+            padding: 16px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            border: none; 
+            border-radius: 10px; 
+            background: #4CAF50; 
+            color: white; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .main-btn.active { 
+            background: #f44336; 
+        }
+        .status-area { 
+            text-align: center; 
+            margin-top: 20px; 
+            font-size: 14px; 
+            color: #888; 
+            min-height: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>Battery Alarm App</h1>
-    
-    <div class="controls">
-        <label for="targetPercent">Kitne % par alarm bajana hai?</label>
-        <select id="targetPercent">
-            <option value="40">40%</option>
-            <option value="50">50%</option>
-            <option value="80">80%</option>
-            <option value="90">90%</option>
-            <option value="100" selected>100%</option>
-        </select>
 
-        <label for="audioFile">Apna MP3 Alarm Sound select karein:</label>
-        <input type="file" id="audioFile" accept="audio/*">
+    <div class="header">Battery Pro</div>
+
+    <div class="app-container">
+        
+        <div class="slider-box">
+            <div class="section-title">Target Battery Level</div>
+            <div class="percent-display" id="percValue">100%</div>
+            <input type="range" id="targetSlider" min="1" max="100" value="100" oninput="updateSlider()">
+        </div>
+
+        <div class="section-title">Select Alarm Sound</div>
+        <div class="sound-list">
+            
+            <div class="sound-item">
+                <input type="radio" name="soundSelect" id="sound1" value="https://www.soundjay.com/buttons/sounds/beep-01a.mp3" checked>
+                <label for="sound1">Classic Beep</label>
+                <button class="play-btn" onclick="previewSound('https://www.soundjay.com/buttons/sounds/beep-01a.mp3')">Play</button>
+            </div>
+
+            <div class="sound-item">
+                <input type="radio" name="soundSelect" id="sound2" value="https://www.soundjay.com/phone/sounds/telephone-ring-03a.mp3">
+                <label for="sound2">Digital Ring</label>
+                <button class="play-btn" onclick="previewSound('https://www.soundjay.com/phone/sounds/telephone-ring-03a.mp3')">Play</button>
+            </div>
+
+            <div class="sound-item">
+                <input type="radio" name="soundSelect" id="sound3" value="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3">
+                <label for="sound3">Alert Bell</label>
+                <button class="play-btn" onclick="previewSound('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3')">Play</button>
+            </div>
+
+        </div>
+
+        <button class="main-btn" id="startBtn" onclick="toggleApp()">Start Monitor</button>
+
+        <div class="status-area" id="statusText">System Ready. Waiting to start.</div>
     </div>
 
-    <div>
-        <button class="btn" onclick="startApp()">Start App</button>
-    </div>
-
-    <div id="status">Status: Waiting to start...</div>
-
-    <audio id="alarmSound" loop></audio>
+    <audio id="mainAlarm" loop></audio>
+    <audio id="previewAudio"></audio>
+    <audio id="silentLooper" loop src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"></audio>
 
     <script>
-        let isAlarmRinging = false;
+        let isRunning = false;
+        let alarmTriggered = false;
 
-        // Jab user nayi MP3 file select karega
-        document.getElementById('audioFile').addEventListener('change', function(event) {
-            let file = event.target.files[0];
-            if (file) {
-                let objectUrl = URL.createObjectURL(file);
-                document.getElementById('alarmSound').src = objectUrl;
-            }
-        });
+        // Update UI when slider moves
+        function updateSlider() {
+            document.getElementById('percValue').innerText = document.getElementById('targetSlider').value + "%";
+        }
 
-        function startApp() {
-            let audioElement = document.getElementById("alarmSound");
-            
-            // Agar user ne MP3 select nahi kiya hai toh default sound laga do
-            if (!audioElement.src) {
-                audioElement.src = "https://www.soundjay.com/buttons/sounds/beep-01a.mp3";
-            }
+        // Preview sound function
+        function previewSound(url) {
+            let player = document.getElementById('previewAudio');
+            player.src = url;
+            player.play();
+        }
 
-            // Audio permission ke liye ek baar play/pause karna zaruri hai
-            audioElement.play().catch(()=>{});
-            audioElement.pause();
+        function toggleApp() {
+            let btn = document.getElementById('startBtn');
+            let status = document.getElementById('statusText');
 
-            if ('getBattery' in navigator) {
-                navigator.getBattery().then(function(battery) {
-                    updateBatteryStatus(battery);
+            if (!isRunning) {
+                // Get selected sound
+                let selectedSound = document.querySelector('input[name="soundSelect"]:checked').value;
+                document.getElementById('mainAlarm').src = selectedSound;
 
-                    battery.addEventListener('levelchange', function() {
-                        updateBatteryStatus(battery);
+                // Unlock audio for browser policy
+                document.getElementById('mainAlarm').play().catch(()=>{});
+                document.getElementById('mainAlarm').pause();
+                
+                // Start silent looper for background execution trick
+                document.getElementById('silentLooper').play().catch(()=>{});
+
+                if ('getBattery' in navigator) {
+                    navigator.getBattery().then(function(battery) {
+                        checkBattery(battery); // initial check
+
+                        // Listeners
+                        battery.onlevelchange = () => checkBattery(battery);
+                        battery.onchargingchange = () => checkBattery(battery);
                     });
-                    
-                    battery.addEventListener('chargingchange', function() {
-                        updateBatteryStatus(battery);
-                    });
-                });
+
+                    isRunning = true;
+                    btn.innerText = "Stop Monitor";
+                    btn.classList.add("active");
+                } else {
+                    status.innerText = "Error: Browser does not support Battery API.";
+                }
             } else {
-                document.getElementById("status").innerText = "Aapka browser Battery API support nahi karta.";
+                // Stop everything
+                isRunning = false;
+                alarmTriggered = false;
+                document.getElementById('mainAlarm').pause();
+                document.getElementById('mainAlarm').currentTime = 0;
+                document.getElementById('silentLooper').pause();
+                
+                btn.innerText = "Start Monitor";
+                btn.classList.remove("active");
+                status.innerText = "Monitor stopped.";
+                status.style.color = "#888";
             }
         }
 
-        function updateBatteryStatus(battery) {
-            let level = Math.round(battery.level * 100);
+        function checkBattery(battery) {
+            if (!isRunning) return;
+
+            let currentLevel = Math.round(battery.level * 100);
             let isCharging = battery.charging;
-            let target = parseInt(document.getElementById("targetPercent").value);
-            let statusText = document.getElementById("status");
+            let targetLevel = parseInt(document.getElementById('targetSlider').value);
+            let status = document.getElementById('statusText');
 
-            statusText.innerText = "Battery: " + level + "% | Charging: " + (isCharging ? "Yes ⚡" : "No");
+            status.innerText = `Current: ${currentLevel}% | Charging: ${isCharging ? 'Yes ⚡' : 'No'}`;
 
-            // Agar battery target % tak pahunch jaye aur charge ho rahi ho
-            if (level >= target && isCharging) {
-                if(!isAlarmRinging) {
-                    document.getElementById("alarmSound").play();
-                    isAlarmRinging = true;
+            if (currentLevel >= targetLevel && isCharging) {
+                if (!alarmTriggered) {
+                    document.getElementById('mainAlarm').play();
+                    alarmTriggered = true;
                 }
-                statusText.style.color = "red";
-                statusText.innerText = "TARGET REACHED (" + target + "%)! Charger Hatao 🛑";
+                status.innerText = `TARGET REACHED! Please unplug charger.`;
+                status.style.color = "#ff5252";
             } else {
-                document.getElementById("alarmSound").pause();
-                document.getElementById("alarmSound").currentTime = 0;
-                isAlarmRinging = false;
-                statusText.style.color = "blue";
+                if (alarmTriggered) {
+                    document.getElementById('mainAlarm').pause();
+                    document.getElementById('mainAlarm').currentTime = 0;
+                    alarmTriggered = false;
+                }
+                status.style.color = "#888";
             }
         }
     </script>
