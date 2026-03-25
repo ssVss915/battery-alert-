@@ -63,25 +63,25 @@
             <input type="range" id="targetSlider" min="1" max="100" value="89" oninput="updateSlider()">
         </div>
 
-        <div class="section-title">Select Alarm Sound</div>
+        <div class="section-title">Select Custom Alarm</div>
         <div class="sound-list">
             
             <div class="sound-item">
-                <input type="radio" name="soundSelect" id="sound1" value="1000050561..mp3" checked>
-                <label for="sound1">Beep Alarm</label>
-                <button type="button" class="play-btn" onclick="togglePreview(this, '1000050561..mp3')">Play</button>
+                <input type="radio" name="soundSelect" id="sound1" value="alarm1.mp3" checked>
+                <label for="sound1">Alarm Sound 1</label>
+                <button type="button" class="play-btn" onclick="togglePreview(this, 'alarm1.mp3')">Play</button>
             </div>
 
             <div class="sound-item">
-                <input type="radio" name="soundSelect" id="sound2" value="1000038179.mp3">
-                <label for="sound2">Ring Alarm</label>
-                <button type="button" class="play-btn" onclick="togglePreview(this, '1000038179.mp3')">Play</button>
+                <input type="radio" name="soundSelect" id="sound2" value="alarm2.mp3">
+                <label for="sound2">Alarm Sound 2</label>
+                <button type="button" class="play-btn" onclick="togglePreview(this, 'alarm2.mp3')">Play</button>
             </div>
 
             <div class="sound-item">
-                <input type="radio" name="soundSelect" id="1000038294.mp3">
-                <label for="sound3">Bell Alarm</label>
-                <button type="button" class="play-btn" onclick="togglePreview(this, '1000038294.mp3')">Play</button>
+                <input type="radio" name="soundSelect" id="sound3" value="alarm3.mp3">
+                <label for="sound3">Alarm Sound 3</label>
+                <button type="button" class="play-btn" onclick="togglePreview(this, 'alarm3.mp3')">Play</button>
             </div>
 
         </div>
@@ -134,7 +134,7 @@
             let mainAlarm = document.getElementById('mainAlarm');
 
             if (!isRunning) {
-                // Audio Unlocker Trick - 0 volume par play aur turant pause karna
+                // Audio Unlocker Trick 
                 let selectedSound = document.querySelector('input[name="soundSelect"]:checked').value;
                 mainAlarm.src = selectedSound;
                 mainAlarm.volume = 0; // Pura mute
@@ -144,7 +144,7 @@
                     playPromise.then(() => {
                         mainAlarm.pause();
                         mainAlarm.currentTime = 0;
-                        mainAlarm.volume = 1; // Wapas unmute taaki actual alarm baj sake
+                        mainAlarm.volume = 1; // Wapas unmute
                     }).catch(error => console.log("Unlock failed: ", error));
                 }
 
@@ -184,7 +184,7 @@
             if (currentLevel >= targetLevel && isCharging) {
                 if (!alarmTriggered) {
                     let mainAlarm = document.getElementById('mainAlarm');
-                    mainAlarm.volume = 1; // Ensure volume is full
+                    mainAlarm.volume = 1; 
                     mainAlarm.play().catch(e => console.log("Alarm play blocked", e));
                     
                     document.getElementById('stopAlarmBtn').style.display = "block"; 
