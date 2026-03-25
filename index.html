@@ -5,117 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battery Pro Alarm</title>
     <style>
-        /* Professional Dark Theme App Style */
         body { 
-            margin: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: #121212; 
-            color: #ffffff; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            height: 100vh;
+            margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #121212; color: #ffffff; display: flex; 
+            flex-direction: column; align-items: center; min-height: 100vh;
         }
         .header { 
-            background: #1f1f1f; 
-            width: 100%; 
-            padding: 20px 0; 
-            text-align: center; 
-            font-size: 22px; 
-            font-weight: bold; 
+            background: #1f1f1f; width: 100%; padding: 20px 0; 
+            text-align: center; font-size: 22px; font-weight: bold; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
         }
         .app-container { 
-            background: #1f1f1f; 
-            width: 90%; 
-            max-width: 400px; 
-            margin-top: 30px; 
-            border-radius: 15px; 
-            padding: 25px; 
-            box-sizing: border-box; 
+            background: #1f1f1f; width: 90%; max-width: 400px; 
+            margin-top: 30px; margin-bottom: 30px; border-radius: 15px; 
+            padding: 25px; box-sizing: border-box; 
             box-shadow: 0 8px 16px rgba(0,0,0,0.5); 
         }
         .section-title { 
-            font-size: 13px; 
-            color: #aaaaaa; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-            margin-bottom: 15px; 
+            font-size: 13px; color: #aaaaaa; text-transform: uppercase; 
+            letter-spacing: 1px; margin-bottom: 15px; 
         }
-        .slider-box { 
-            text-align: center; 
-            margin-bottom: 30px; 
-        }
-        .percent-display { 
-            font-size: 56px; 
-            font-weight: bold; 
-            color: #4CAF50; 
-            margin-bottom: 10px; 
-        }
-        /* Styling the range slider to look native */
-        input[type=range] { 
-            width: 100%; 
-            accent-color: #4CAF50; 
-            cursor: pointer;
-        }
-        .sound-list { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-            margin-bottom: 30px; 
-        }
+        .slider-box { text-align: center; margin-bottom: 30px; }
+        .percent-display { font-size: 56px; font-weight: bold; color: #4CAF50; margin-bottom: 10px; }
+        input[type=range] { width: 100%; accent-color: #4CAF50; cursor: pointer; }
+        .sound-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
         .sound-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: #2a2a2a; 
-            padding: 12px 15px; 
-            border-radius: 10px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: #2a2a2a; padding: 12px 15px; border-radius: 10px; 
         }
-        .sound-item label { 
-            flex-grow: 1; 
-            margin-left: 10px; 
-            font-size: 16px; 
-            cursor: pointer; 
-        }
-        input[type="radio"] {
-            accent-color: #4CAF50;
-            transform: scale(1.3);
-        }
+        .sound-item label { flex-grow: 1; margin-left: 10px; font-size: 16px; cursor: pointer; }
+        input[type="radio"] { accent-color: #4CAF50; transform: scale(1.3); }
         .play-btn { 
-            background: #444; 
-            border: none; 
-            color: white; 
-            padding: 8px 15px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 14px;
+            background: #4CAF50; border: none; color: white; padding: 8px 0; 
+            border-radius: 6px; cursor: pointer; font-size: 14px; width: 65px; text-align: center;
         }
-        .play-btn:hover { background: #555; }
+        .play-btn.playing { background: #f44336; }
         .main-btn { 
-            width: 100%; 
-            padding: 16px; 
-            font-size: 18px; 
-            font-weight: bold; 
-            border: none; 
-            border-radius: 10px; 
-            background: #4CAF50; 
-            color: white; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            width: 100%; padding: 16px; font-size: 18px; font-weight: bold; 
+            border: none; border-radius: 10px; background: #4CAF50; color: white; 
+            cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
         }
-        .main-btn.active { 
-            background: #f44336; 
-        }
-        .status-area { 
-            text-align: center; 
-            margin-top: 20px; 
-            font-size: 14px; 
-            color: #888; 
-            min-height: 20px;
-        }
+        .main-btn.active { background: #ff9800; }
+        #stopAlarmBtn { background: #f44336; margin-top: 15px; display: none; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.8; transform: scale(0.98); } }
+        .status-area { text-align: center; margin-top: 20px; font-size: 14px; color: #888; min-height: 20px; }
     </style>
 </head>
 <body>
@@ -126,98 +59,117 @@
         
         <div class="slider-box">
             <div class="section-title">Target Battery Level</div>
-            <div class="percent-display" id="percValue">100%</div>
-            <input type="range" id="targetSlider" min="1" max="100" value="100" oninput="updateSlider()">
+            <div class="percent-display" id="percValue">89%</div>
+            <input type="range" id="targetSlider" min="1" max="100" value="89" oninput="updateSlider()">
         </div>
 
-                <div class="section-title">Select Alarm Sound</div>
+        <div class="section-title">Select Alarm Sound</div>
         <div class="sound-list">
             
             <div class="sound-item">
                 <input type="radio" name="soundSelect" id="sound1" value="alarm1.mp3" checked>
-                <label for="sound1">Mera Custom Alarm 1</label>
-                <button class="play-btn" onclick="previewSound('1000038179.mp3')">Play</button>
+                <label for="sound1">Custom Alarm 1</label>
+                <button type="button" class="play-btn" onclick="togglePreview(this, '1000038179.mp3')">Play</button>
             </div>
 
             <div class="sound-item">
                 <input type="radio" name="soundSelect" id="sound2" value="alarm2.mp3">
-                <label for="sound2">DJ Wala Alarm</label>
-                <button class="play-btn" onclick="previewSound('1000038294.mp3')">Play</button>
+                <label for="sound2">Custom Alarm 2</label>
+                <button type="button" class="play-btn" onclick="togglePreview(this, '1000038294.mp3')">Play</button>
             </div>
 
             <div class="sound-item">
                 <input type="radio" name="soundSelect" id="sound3" value="alarm3.mp3">
-                <label for="sound3">Bhakti Song Alarm</label>
-                <button class="play-btn" onclick="previewSound('1000050561..mp3')">Play</button>
+                <label for="sound3">Custom Alarm 3</label>
+                <button type="button" class="play-btn" onclick="togglePreview(this, '1000050561..mp3')">Play</button>
             </div>
 
         </div>
-        
 
         <button class="main-btn" id="startBtn" onclick="toggleApp()">Start Monitor</button>
+        
+        <button class="main-btn" id="stopAlarmBtn" onclick="stopRinging()">STOP ALARM 🛑</button>
 
         <div class="status-area" id="statusText">System Ready. Waiting to start.</div>
     </div>
 
     <audio id="mainAlarm" loop></audio>
     <audio id="previewAudio"></audio>
-    <audio id="silentLooper" loop src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"></audio>
 
     <script>
         let isRunning = false;
         let alarmTriggered = false;
+        let previewPlayer = document.getElementById('previewAudio');
+        let currentBtn = null;
 
-        // Update UI when slider moves
         function updateSlider() {
             document.getElementById('percValue').innerText = document.getElementById('targetSlider').value + "%";
         }
 
-        // Preview sound function
-        function previewSound(url) {
-            let player = document.getElementById('previewAudio');
-            player.src = url;
-            player.play();
+        // Preview sound function: Play aur Stop ek hi button se
+        function togglePreview(btn, url) {
+            if (currentBtn === btn && !previewPlayer.paused) {
+                previewPlayer.pause();
+                previewPlayer.currentTime = 0;
+                btn.innerText = "Play";
+                btn.classList.remove("playing");
+                return;
+            }
+            
+            if (currentBtn) {
+                currentBtn.innerText = "Play";
+                currentBtn.classList.remove("playing");
+            }
+
+            previewPlayer.src = url;
+            previewPlayer.play();
+            btn.innerText = "Stop";
+            btn.classList.add("playing");
+            currentBtn = btn;
+
+            previewPlayer.onended = () => {
+                btn.innerText = "Play";
+                btn.classList.remove("playing");
+            };
         }
 
         function toggleApp() {
             let btn = document.getElementById('startBtn');
             let status = document.getElementById('statusText');
+            let mainAlarm = document.getElementById('mainAlarm');
 
             if (!isRunning) {
-                // Get selected sound
+                // Background me alarm tayyar karna (Browser permission ke liye)
                 let selectedSound = document.querySelector('input[name="soundSelect"]:checked').value;
-                document.getElementById('mainAlarm').src = selectedSound;
-
-                // Unlock audio for browser policy
-                document.getElementById('mainAlarm').play().catch(()=>{});
-                document.getElementById('mainAlarm').pause();
+                mainAlarm.src = selectedSound;
+                mainAlarm.load();
                 
-                // Start silent looper for background execution trick
-                document.getElementById('silentLooper').play().catch(()=>{});
+                // Silent trick to unlock auto-play
+                let playPromise = mainAlarm.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        mainAlarm.pause();
+                        mainAlarm.currentTime = 0;
+                    }).catch(error => console.log("Unlock failed: ", error));
+                }
 
                 if ('getBattery' in navigator) {
                     navigator.getBattery().then(function(battery) {
-                        checkBattery(battery); // initial check
-
-                        // Listeners
+                        checkBattery(battery);
                         battery.onlevelchange = () => checkBattery(battery);
                         battery.onchargingchange = () => checkBattery(battery);
                     });
 
                     isRunning = true;
-                    btn.innerText = "Stop Monitor";
+                    btn.innerText = "Monitoring... (Click to Stop)";
                     btn.classList.add("active");
                 } else {
-                    status.innerText = "Error: Browser does not support Battery API.";
+                    status.innerText = "Error: Browser Battery API support nahi karta.";
                 }
             } else {
-                // Stop everything
+                // Monitor Stop Karna
                 isRunning = false;
-                alarmTriggered = false;
-                document.getElementById('mainAlarm').pause();
-                document.getElementById('mainAlarm').currentTime = 0;
-                document.getElementById('silentLooper').pause();
-                
+                stopRinging();
                 btn.innerText = "Start Monitor";
                 btn.classList.remove("active");
                 status.innerText = "Monitor stopped.";
@@ -235,20 +187,39 @@
 
             status.innerText = `Current: ${currentLevel}% | Charging: ${isCharging ? 'Yes ⚡' : 'No'}`;
 
+            // Agar target percentage match ho jaye aur phone charge ho raha ho
             if (currentLevel >= targetLevel && isCharging) {
                 if (!alarmTriggered) {
                     document.getElementById('mainAlarm').play();
+                    document.getElementById('stopAlarmBtn').style.display = "block"; // Stop button dikhao
+                    document.getElementById('startBtn').style.display = "none"; // Start button chupao
                     alarmTriggered = true;
                 }
-                status.innerText = `TARGET REACHED! Please unplug charger.`;
+                status.innerText = `TARGET ${targetLevel}% REACHED! Please unplug charger.`;
                 status.style.color = "#ff5252";
             } else {
-                if (alarmTriggered) {
-                    document.getElementById('mainAlarm').pause();
-                    document.getElementById('mainAlarm').currentTime = 0;
-                    alarmTriggered = false;
+                if (alarmTriggered && !isCharging) {
+                    // Agar charger nikal diya toh apne aap band ho jayega
+                    stopRinging();
                 }
-                status.style.color = "#888";
+            }
+        }
+
+        function stopRinging() {
+            let mainAlarm = document.getElementById('mainAlarm');
+            mainAlarm.pause();
+            mainAlarm.currentTime = 0;
+            alarmTriggered = false;
+            
+            // Buttons ko wapas normal state me lao
+            document.getElementById('stopAlarmBtn').style.display = "none";
+            document.getElementById('startBtn').style.display = "block";
+            
+            // Agar user ne stop button dabaya hai, toh app ka status reset karein
+            let status = document.getElementById('statusText');
+            status.style.color = "#888";
+            if (isRunning) {
+                 status.innerText = "Alarm stopped. Monitoring continues...";
             }
         }
     </script>
