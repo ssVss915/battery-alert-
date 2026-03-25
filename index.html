@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Battery Alarm</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f4;}
+        h1 { color: #333; }
+        .controls { background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); display: inline-block; margin-bottom: 20px; text-align: left;}
+        .controls label { font-weight: bold; display: block; margin-top: 10px; }
+        select, input[type="file"] { margin-top: 5px; padding: 5px; width: 100%; }
+        #status { font-size: 24px; font-weight: bold; margin-top: 20px; color: blue; }
+        .btn { padding: 15px 30px; font-size: 18px; margin-top: 20px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 5px; width: 100%;}
+    </style>
+</head>
+<body>
+    <h1>Battery Alarm App</h1>
+    
+    <div class="controls">
+        <label for="targetPercent">Kitne % par alarm bajana hai?</label>
+        <select id="targetPercent">
+            <option value="40">40%</option>
+            <option value="50">50%</option>
+            <option value="80">80%</option>
+            <option value="90">90%</option>
+            <option value="100" selected>100%</option>
+        </select>
+
+        <label for="audioFile">Apna MP3 Alarm Sound select karein:</label>
+        <input type="file" id="audioFile" accept="audio/*">
+    </div>
+
+    <div>
+        <button class="btn" onclick="startApp()">Start App</button>
+    </div>
+
+    <div id="status">Status: Waiting to start...</div>
+
+    <audio id="alarmSound" loop></audio>
+
+    <script>
+        let isAlarmRinging = false;
+
+        // Jab user nayi MP3 file select karega
+        document.getElementById('audioFile').addEventListener('change', function(event) {
+            let file = event.target.files[0];
+            if (file) {
+                let objectUrl = URL.createObjectURL(file);
+                document.getElementById('alarmSound').src = objectUrl;
+            }
+        });
+
+        function startApp() {
+            let audioElement = document.getElementById("alarmSound");
+            
+            // Agar user ne MP3 select nahi kiya hai toh default sound laga do
+            if (!audioElement.src) {
+                audioElement.src = "https://www.soundjay.com/buttons/sounds/beep-01a.mp3";
+            }
+
+            // Audio permission ke liye ek baar play/pause karna zaruri hai
+            audioElement.play().catch(()=>{});
+            audioElement.pause();
+
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(function(battery) {
+                    updateBatteryStatus(battery);
+
+                    battery.addEventListener('levelchange', function() {
+                        updateBatteryStatus(battery);
+                    });
+                    
+                    battery.addEventListener('chargingchange', function() {
+                        updateBatteryStatus(battery);
+                    });
+                });
+            } else {
+                document.getElementById("status").innerText = "Aapka browser Battery API support nahi karta.";
+            }
+        }
+
+        function updateBatteryStatus(battery) {
+            let level = Math.round(battery.level * 100);
+            let isCharging = battery.charging;
+            let target = parseInt(document.getElementById("targetPercent").value);
+            let statusText = document.getElementById("status");
+
+            statusText.innerText = "Battery: " + level + "% | Charging: " + (isCharging ? "Yes ⚡" : "No");
+
+            // Agar battery target % tak pahunch jaye aur charge ho rahi ho
+            if (level >= target && isCharging) {
+                if(!isAlarmRinging) {
+                    document.getElementById("alarmSound").play();
+                    isAlarmRinging = true;
+                }
+                statusText.style.color = "red";
+                statusText.innerText = "TARGET REACHED (" + target + "%)! Charger Hatao 🛑";
+            } else {
+                document.getElementById("alarmSound").pause();
+                document.getElementById("alarmSound").currentTime = 0;
+                isAlarmRinging = false;
+                statusText.style.color = "blue";
+            }
+        }
+    </script>
+</body>
+</html>
