@@ -67,33 +67,32 @@
         <div class="sound-list">
             
             <div class="sound-item">
-                <input type="radio" name="soundSelect" id="sound1" value="alarm1.mp3" checked>
-                <label for="sound1">Custom Alarm 1</label>
-                <button type="button" class="play-btn" onclick="togglePreview(this, '1000038179.mp3')">Play</button>
+                <input type="radio" name="soundSelect" id="sound1" value="https://www.soundjay.com/buttons/sounds/beep-01a.mp3" checked>
+                <label for="sound1">Beep Alarm</label>
+                <button type="button" class="play-btn" onclick="togglePreview(this, 'https://www.soundjay.com/buttons/sounds/beep-01a.mp3')">Play</button>
             </div>
 
             <div class="sound-item">
-                <input type="radio" name="soundSelect" id="sound2" value="alarm2.mp3">
-                <label for="sound2">Custom Alarm 2</label>
-                <button type="button" class="play-btn" onclick="togglePreview(this, '1000038294.mp3')">Play</button>
+                <input type="radio" name="soundSelect" id="sound2" value="https://www.soundjay.com/phone/sounds/telephone-ring-03a.mp3">
+                <label for="sound2">Ring Alarm</label>
+                <button type="button" class="play-btn" onclick="togglePreview(this, 'https://www.soundjay.com/phone/sounds/telephone-ring-03a.mp3')">Play</button>
             </div>
 
             <div class="sound-item">
-                <input type="radio" name="soundSelect" id="sound3" value="alarm3.mp3">
-                <label for="sound3">Custom Alarm 3</label>
-                <button type="button" class="play-btn" onclick="togglePreview(this, '1000050561..mp3')">Play</button>
+                <input type="radio" name="soundSelect" id="sound3" value="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3">
+                <label for="sound3">Bell Alarm</label>
+                <button type="button" class="play-btn" onclick="togglePreview(this, 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3')">Play</button>
             </div>
 
         </div>
 
         <button class="main-btn" id="startBtn" onclick="toggleApp()">Start Monitor</button>
-        
         <button class="main-btn" id="stopAlarmBtn" onclick="stopRinging()">STOP ALARM 🛑</button>
 
         <div class="status-area" id="statusText">System Ready. Waiting to start.</div>
     </div>
 
-    <audio id="mainAlarm" loop></audio>
+    <audio id="mainAlarm" loop preload="auto"></audio>
     <audio id="previewAudio"></audio>
 
     <script>
@@ -106,7 +105,6 @@
             document.getElementById('percValue').innerText = document.getElementById('targetSlider').value + "%";
         }
 
-        // Preview sound function: Play aur Stop ek hi button se
         function togglePreview(btn, url) {
             if (currentBtn === btn && !previewPlayer.paused) {
                 previewPlayer.pause();
@@ -115,18 +113,15 @@
                 btn.classList.remove("playing");
                 return;
             }
-            
             if (currentBtn) {
                 currentBtn.innerText = "Play";
                 currentBtn.classList.remove("playing");
             }
-
             previewPlayer.src = url;
             previewPlayer.play();
             btn.innerText = "Stop";
             btn.classList.add("playing");
             currentBtn = btn;
-
             previewPlayer.onended = () => {
                 btn.innerText = "Play";
                 btn.classList.remove("playing");
@@ -139,17 +134,17 @@
             let mainAlarm = document.getElementById('mainAlarm');
 
             if (!isRunning) {
-                // Background me alarm tayyar karna (Browser permission ke liye)
+                // Audio Unlocker Trick - 0 volume par play aur turant pause karna
                 let selectedSound = document.querySelector('input[name="soundSelect"]:checked').value;
                 mainAlarm.src = selectedSound;
-                mainAlarm.load();
+                mainAlarm.volume = 0; // Pura mute
                 
-                // Silent trick to unlock auto-play
                 let playPromise = mainAlarm.play();
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
                         mainAlarm.pause();
                         mainAlarm.currentTime = 0;
+                        mainAlarm.volume = 1; // Wapas unmute taaki actual alarm baj sake
                     }).catch(error => console.log("Unlock failed: ", error));
                 }
 
@@ -167,7 +162,6 @@
                     status.innerText = "Error: Browser Battery API support nahi karta.";
                 }
             } else {
-                // Monitor Stop Karna
                 isRunning = false;
                 stopRinging();
                 btn.innerText = "Start Monitor";
@@ -187,19 +181,20 @@
 
             status.innerText = `Current: ${currentLevel}% | Charging: ${isCharging ? 'Yes ⚡' : 'No'}`;
 
-            // Agar target percentage match ho jaye aur phone charge ho raha ho
             if (currentLevel >= targetLevel && isCharging) {
                 if (!alarmTriggered) {
-                    document.getElementById('mainAlarm').play();
-                    document.getElementById('stopAlarmBtn').style.display = "block"; // Stop button dikhao
-                    document.getElementById('startBtn').style.display = "none"; // Start button chupao
+                    let mainAlarm = document.getElementById('mainAlarm');
+                    mainAlarm.volume = 1; // Ensure volume is full
+                    mainAlarm.play().catch(e => console.log("Alarm play blocked", e));
+                    
+                    document.getElementById('stopAlarmBtn').style.display = "block"; 
+                    document.getElementById('startBtn').style.display = "none"; 
                     alarmTriggered = true;
                 }
                 status.innerText = `TARGET ${targetLevel}% REACHED! Please unplug charger.`;
                 status.style.color = "#ff5252";
             } else {
                 if (alarmTriggered && !isCharging) {
-                    // Agar charger nikal diya toh apne aap band ho jayega
                     stopRinging();
                 }
             }
@@ -211,11 +206,9 @@
             mainAlarm.currentTime = 0;
             alarmTriggered = false;
             
-            // Buttons ko wapas normal state me lao
             document.getElementById('stopAlarmBtn').style.display = "none";
             document.getElementById('startBtn').style.display = "block";
             
-            // Agar user ne stop button dabaya hai, toh app ka status reset karein
             let status = document.getElementById('statusText');
             status.style.color = "#888";
             if (isRunning) {
